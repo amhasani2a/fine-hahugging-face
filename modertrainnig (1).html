@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دفترچه کدنویس حرفه‌ای آموزش Hugging Face</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --success: #2a9d8f;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 2px solid var(--accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: var(--accent);
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(76, 201, 240, 0.5);
+        }
+        
+        .header p {
+            color: #b8b8b8;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .warning-banner {
+            background: linear-gradient(90deg, var(--warning) 0%, #e76f51 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(248, 150, 30, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(248, 150, 30, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(248, 150, 30, 0); }
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 12px;
+            padding: 12px;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(67, 97, 238, 0.2);
+            color: #b8b8b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+        
+        .tab:hover {
+            background: rgba(67, 97, 238, 0.4);
+            color: white;
+        }
+        
+        .tab.active {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(30, 30, 46, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--primary);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .data-input-section {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+            min-height: 600px;
+        }
+        
+        @media (max-width: 1200px) {
+            .data-input-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .data-table-container {
+            background: rgba(40, 40, 60, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .table-title {
+            color: var(--accent);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .data-table {
+            flex: 1;
+            overflow: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            background: rgba(67, 97, 238, 0.3);
+            padding: 15px;
+            text-align: right;
+            color: var(--accent);
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        tr:hover td {
+            background: rgba(76, 201, 240, 0.1);
+        }
+        
+        .text-cell {
+            max-width: 500px;
+            word-break: break-word;
+        }
+        
+        .label-cell {
+            max-width: 200px;
+        }
+        
+        .label-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border-radius: 6px;
+            text-align: right;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border-radius: 6px;
+            text-align: right;
+            min-height: 60px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(90deg, var(--success) 0%, #1a936f 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 157, 143, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, var(--danger) 0%, #b5179e 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(90deg, var(--warning) 0%, #e76f51 100%);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(248, 150, 30, 0.4);
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .panel {
+            background: rgba(40, 40, 60, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid;
+        }
+        
+        .stats-panel {
+            border-color: var(--accent);
+        }
+        
+        .controls-panel {
+            border-color: var(--primary);
+        }
+        
+        .preview-panel {
+            border-color: var(--success);
+        }
+        
+        .panel-title {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            color: var(--accent);
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .alert {
+            background: rgba(248, 150, 30, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert i {
+            color: var(--warning);
+            font-size: 1.2rem;
+        }
+        
+        .alert p {
+            color: #ffcc99;
+            font-size: 0.95rem;
+        }
+        
+        .label-distribution {
+            margin-top: 20px;
+        }
+        
+        .distribution-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .distribution-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .label-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .label-item:hover {
+            background: rgba(76, 201, 240, 0.1);
+            transform: translateX(-5px);
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .model-settings {
+            margin-top: 30px;
+        }
+        
+        .setting-group {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-title {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-label {
+            color: #b8b8b8;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            background-size: 12px;
+            padding-left: 40px;
+        }
+        
+        .code-output-section {
+            background: rgba(40, 40, 60, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--primary);
+            margin-bottom: 30px;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .code-title {
+            color: var(--primary);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .code-status {
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .code-editor {
+            height: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 14px;
+            font-family: 'Cascadia Code', 'Courier New', monospace;
+            line-height: 1.6;
+        }
+        
+        .final-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn-lg {
+            padding: 18px 36px;
+            font-size: 1.2rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: rgba(30, 30, 46, 0.98);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid var(--accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .modal-title {
+            color: var(--accent);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 2.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            background: rgba(247, 37, 133, 0.1);
+            transform: rotate(90deg);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+            font-size: 0.95rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .badge-warning {
+            background: rgba(248, 150, 30, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+        
+        .badge-success {
+            background: rgba(42, 157, 143, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        
+        .badge-danger {
+            background: rgba(247, 37, 133, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
+        .import-export-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+        
+        .import-export-box textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+            padding: 15px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            right: 50%;
+            transform: translateX(50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border: 1px solid var(--accent);
+            pointer-events: none;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .data-quality-warnings {
+            margin-top: 20px;
+        }
+        
+        .warning-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(248, 150, 30, 0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(248, 150, 30, 0.3);
+        }
+        
+        .warning-item i {
+            color: var(--warning);
+        }
+        
+        .row-actions {
+            display: flex;
+            gap: 8px;
+            min-width: 100px;
+        }
+        
+        .action-btn {
+            padding: 6px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+        
+        .action-btn:hover {
+            background: rgba(76, 201, 240, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .action-btn.delete {
+            background: rgba(247, 37, 133, 0.2);
+        }
+        
+        .action-btn.delete:hover {
+            background: rgba(247, 37, 133, 0.4);
+        }
+        
+        .action-btn.edit {
+            background: rgba(42, 157, 143, 0.2);
+        }
+        
+        .action-btn.edit:hover {
+            background: rgba(42, 157, 143, 0.4);
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> دفترچه کدنویس حرفه‌ای آموزش مدل</h1>
+            <p>ابزار ایمن برای تبدیل داده‌های متنی به کد آموزش Hugging Face - با قابلیت‌های کنترل کیفیت پیشرفته</p>
+        </div>
+        
+        <div class="warning-banner">
+            <i class="fas fa-exclamation-triangle fa-2x"></i>
+            <div>
+                <h3>توجه: هرگز از دو فایل جداگانه برای متن و برچسب استفاده نکنید!</h3>
+                <p>این ابزار از جدول یکپارچه استفاده می‌کند تا از جابجایی داده‌ها جلوگیری کند.</p>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="data-input">
+                <i class="fas fa-table"></i> ورودی داده‌ها
+            </button>
+            <button class="tab" data-tab="model-settings">
+                <i class="fas fa-cogs"></i> تنظیمات مدل
+            </button>
+            <button class="tab" data-tab="code-output">
+                <i class="fas fa-code"></i> کد تولید شده
+            </button>
+            <button class="tab" data-tab="import-export">
+                <i class="fas fa-file-export"></i> وارد/صادر کردن
+            </button>
+        </div>
+        
+        <!-- تب ورودی داده‌ها -->
+        <div id="data-input" class="tab-content active">
+            <div class="data-input-section">
+                <div class="data-table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fas fa-database"></i> جدول داده‌ها
+                            <span class="badge badge-warning" id="dataCount">0 رکورد</span>
+                        </h3>
+                        <div class="table-controls">
+                            <button class="btn btn-success btn-sm" id="addRow">
+                                <i class="fas fa-plus"></i> افزودن ردیف
+                            </button>
+                            <button class="btn btn-danger btn-sm" id="clearTable">
+                                <i class="fas fa-trash"></i> پاک کردن همه
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="data-table">
+                        <table id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>متن</th>
+                                    <th style="width: 200px;">برچسب</th>
+                                    <th style="width: 120px;">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- ردیف‌ها اینجا ساخته می‌شوند -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-controls">
+                        <button class="btn btn-primary" id="addSampleData">
+                            <i class="fas fa-vial"></i> افزودن داده نمونه
+                        </button>
+                        <button class="btn btn-warning" id="normalizeLabels">
+                            <i class="fas fa-broom"></i> یکسان‌سازی برچسب‌ها
+                        </button>
+                        <button class="btn btn-success" id="analyzeData">
+                            <i class="fas fa-chart-bar"></i> تحلیل داده‌ها
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sidebar">
+                    <div class="panel stats-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-chart-line"></i> آمار داده‌ها
+                        </h3>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">تعداد کل نمونه‌ها</div>
+                                <div class="stat-value" id="totalSamples">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">برچسب‌های منحصربفرد</div>
+                                <div class="stat-value" id="uniqueLabels">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">میانگین طول متن</div>
+                                <div class="stat-value" id="avgTextLength">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">تعادل داده‌ها</div>
+                                <div class="stat-value" id="dataBalance">0%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="label-distribution">
+                            <h4 style="color: var(--accent); margin: 20px 0 15px 0;">توزیع برچسب‌ها</h4>
+                            <div id="distributionBars">
+                                <!-- نوارهای توزیع اینجا ساخته می‌شوند -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="data-quality-warnings" id="qualityWarnings">
+                        <!-- هشدارهای کیفیت داده اینجا نمایش داده می‌شوند -->
+                    </div>
+                    
+                    <div class="panel preview-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-eye"></i> پیش‌نمایش داده‌ها
+                        </h3>
+                        <div id="dataPreview">
+                            <p style="color: #888; text-align: center; padding: 20px;">
+                                داده‌ای برای نمایش وجود ندارد
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- تب تنظیمات مدل -->
+        <div id="model-settings" class="tab-content">
+            <div class="model-settings">
+                <div class="warning-banner" style="background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);">
+                    <i class="fas fa-robot fa-2x"></i>
+                    <div>
+                        <h3>تنظیمات هوشمند مدل</h3>
+                        <p>این تنظیمات بر اساس تحلیل داده‌های شما بهینه می‌شوند</p>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3 class="setting-title">
+                        <i class="fas fa-brain"></i> انتخاب مدل پایه
+                    </h3>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label">زبان داده‌های شما</label>
+                            <select class="form-control form-select" id="languageSelect">
+                                <option value="fa">فارسی</option>
+                                <option value="en">انگلیسی</option>
+                                <option value="multilingual">چندزبانه</option>
+                                <option value="other">سایر</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">مدل پیشنهادی</label>
+                            <select class="form-control form-select" id="modelSelect">
+                                <option value="HooshvareLab/bert-fa-base-uncased">BERT فارسی - HooshvareLab</option>
+                                <option value="distilbert-base-uncased">DistilBERT انگلیسی</option>
+                                <option value="bert-base-uncased">BERT انگلیسی</option>
+                                <option value="xlm-roberta-base">XLM-RoBERTa (چندزبانه)</option>
+                                <option value="custom">مدل سفارشی</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="customModelGroup" style="display: none;">
+                        <label class="form-label">نام مدل Hugging Face</label>
+                        <input type="text" class="form-control" id="customModelName" 
+                               placeholder="مثال: bert-base-uncased">
+                        <small style="color: #888; margin-top: 5px;">نام مدل را از Hugging Face Model Hub وارد کنید</small>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3 class="setting-title">
+                        <i class="fas fa-sliders-h"></i> پارامترهای آموزش
+                    </h3>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label">تعداد دوره‌های آموزش (Epochs)</label>
+                            <input type="number" class="form-control" id="numEpochs" value="3" min="1" max="50">
+                            <small style="color: #888; margin-top: 5px;">برای داده‌های کوچک 3-5، برای داده‌های بزرگ 1-3</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">اندازه دسته (Batch Size)</label>
+                            <select class="form-control form-select" id="batchSize">
+                                <option value="8">8 (برای GPU با حافظه کم)</option>
+                                <option value="16" selected>16 (پیشنهادی)</option>
+                                <option value="32">32 (برای GPU قوی)</option>
+                                <option value="64">64 (فقط برای TPU)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label">نرخ یادگیری (Learning Rate)</label>
+                            <select class="form-control form-select" id="learningRate">
+                                <option value="1e-5">0.00001 (خیلی آهسته)</option>
+                                <option value="2e-5" selected>0.00002 (پیشنهادی)</option>
+                                <option value="5e-5">0.00005 (سریع)</option>
+                                <option value="1e-4">0.0001 (خیلی سریع - مراقب باشید)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">حداکثر طول متن (توکن)</label>
+                            <select class="form-control form-select" id="maxLength">
+                                <option value="128">128 (برای متن‌های کوتاه)</option>
+                                <option value="256" selected>256 (پیشنهادی)</option>
+                                <option value="512">512 (برای متن‌های طولانی)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3 class="setting-title">
+                        <i class="fas fa-chart-bar"></i> ارزیابی و گزارش‌دهی
+                    </h3>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label tooltip">
+                                معیار ارزیابی اصلی
+                                <span class="tooltip-text">برای داده‌های نامتوازن از F1-Score استفاده کنید. Accuracy فقط برای داده‌های متوازن مناسب است.</span>
+                            </label>
+                            <select class="form-control form-select" id="evalMetric">
+                                <option value="f1">F1-Score (پیشنهادی)</option>
+                                <option value="accuracy">Accuracy</option>
+                                <option value="precision">Precision</option>
+                                <option value="recall">Recall</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">نسبت داده آزمایشی</label>
+                            <select class="form-control form-select" id="testSplit">
+                                <option value="0.1">10%</option>
+                                <option value="0.2" selected>20%</option>
+                                <option value="0.3">30%</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <p>
+                            <strong>توجه:</strong> در صورت نامتوازن بودن داده‌ها، گزارش طبقه‌بندی کامل (Classification Report) 
+                            به طور خودکار تولید می‌شود که شامل Precision، Recall و F1-Score برای هر کلاس است.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- تب کد تولید شده -->
+        <div id="code-output" class="tab-content">
+            <div class="code-output-section">
+                <div class="code-header">
+                    <h3 class="code-title">
+                        <i class="fas fa-file-code"></i> کد پایتون کامل
+                        <span class="badge badge-success" id="codeReadyStatus">آماده نیست</span>
+                    </h3>
+                    <div class="code-status" id="codeStats">0 خط کد</div>
+                </div>
+                
+                <div class="code-editor">
+                    <textarea id="pythonCodeOutput"># کد آموزش مدل Hugging Face
+# این کد توسط دفترچه کدنویس حرفه‌ای تولید شده است
+
+print("لطفا ابتدا داده‌های خود را وارد کرده و سپس کد را تولید کنید")</textarea>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="codeProgress"></div>
+                </div>
+            </div>
+            
+            <div class="final-controls">
+                <button class="btn btn-primary btn-lg" id="generateFullCode">
+                    <i class="fas fa-cogs"></i> تولید کد کامل
+                </button>
+                <button class="btn btn-success btn-lg" id="copyCode">
+                    <i class="fas fa-copy"></i> کپی کد
+                </button>
+                <button class="btn btn-danger btn-lg" id="downloadCode">
+                    <i class="fas fa-download"></i> دانلود فایل .py
+                </button>
+                <button class="btn btn-warning btn-lg" id="openColab">
+                    <i class="fab fa-google"></i> باز کردن در Colab
+                </button>
+            </div>
+        </div>
+        
+        <!-- تب وارد/صادر کردن -->
+        <div id="import-export" class="tab-content">
+            <div class="setting-group">
+                <h3 class="setting-title">
+                    <i class="fas fa-file-import"></i> وارد کردن داده
+                </h3>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">فرمت CSV</h4>
+                    <textarea id="csvImport" placeholder="متن,برچسب
+این یک متن نمونه است,مثبت
+متن نمونه دوم,منفی
+هر خط باید شامل متن و برچسب باشد که با کاما از هم جدا شده‌اند"></textarea>
+                    <button class="btn btn-primary" id="importCSV">
+                        <i class="fas fa-upload"></i> وارد کردن از CSV
+                    </button>
+                </div>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">فرمت JSON</h4>
+                    <textarea id="jsonImport" placeholder='[
+  {"text": "متن اول", "label": "مثبت"},
+  {"text": "متن دوم", "label": "منفی"}
+]'></textarea>
+                    <button class="btn btn-primary" id="importJSON">
+                        <i class="fas fa-upload"></i> وارد کردن از JSON
+                    </button>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h3 class="setting-title">
+                    <i class="fas fa-file-export"></i> صادر کردن داده
+                </h3>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">خروجی CSV</h4>
+                    <textarea id="csvExport" readonly></textarea>
+                    <button class="btn btn-success" id="copyCSV">
+                        <i class="fas fa-copy"></i> کپی CSV
+                    </button>
+                    <button class="btn btn-danger" id="downloadCSV">
+                        <i class="fas fa-download"></i> دانلود CSV
+                    </button>
+                </div>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">خروجی JSON</h4>
+                    <textarea id="jsonExport" readonly></textarea>
+                    <button class="btn btn-success" id="copyJSON">
+                        <i class="fas fa-copy"></i> کپی JSON
+                    </button>
+                    <button class="btn btn-danger" id="downloadJSON">
+                        <i class="fas fa-download"></i> دانلود JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><i class="fas fa-code"></i> دفترچه کدنویس حرفه‌ای آموزش Hugging Face - نسخه 2.0</p>
+            <p>طراحی شده با تمرکز بر امنیت داده‌ها، کیفیت کد و تجربه کاربری ایمن</p>
+            <p style="margin-top: 10px; font-size: 0.85rem; color: #666;">
+                قابلیت‌ها: کنترل کیفیت داده‌ها، جلوگیری از جابجایی، گزارش‌دهی پیشرفته، پشتیبانی از مدل‌های چندزبانه
+            </p>
+        </div>
+    </div>
+    
+    <!-- مودال تحلیل داده‌ها -->
+    <div class="modal" id="analysisModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-chart-pie"></i> تحلیل پیشرفته داده‌ها
+                </h2>
+                <button class="close-modal" id="closeAnalysisModal">&times;</button>
+            </div>
+            
+            <div id="analysisContent">
+                <!-- محتوای تحلیل اینجا لود می‌شود -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        // مقداردهی اولیه
+        let dataset = [];
+        let labelStats = {};
+        let codeEditor;
+        let dataChanged = false;
+        
+        // تنظیم CodeMirror برای ویرایشگر کد
+        codeEditor = CodeMirror.fromTextArea(document.getElementById('pythonCodeOutput'), {
+            mode: 'python',
+            theme: 'monokai',
+            lineNumbers: true,
+            readOnly: false,
+            lineWrapping: true,
+            autofocus: true
+        });
+        
+        // مدیریت تب‌ها
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+                
+                // اگر تب خروجی CSV/JSON فعال شد، داده‌ها را به روز کن
+                if (tabId === 'import-export') {
+                    updateExportData();
+                }
+            });
+        });
+        
+        // مدیریت تغییر زبان
+        document.getElementById('languageSelect').addEventListener('change', function() {
+            const lang = this.value;
+            const modelSelect = document.getElementById('modelSelect');
+            
+            if (lang === 'fa') {
+                modelSelect.innerHTML = `
+                    <option value="HooshvareLab/bert-fa-base-uncased">BERT فارسی - HooshvareLab</option>
+                    <option value="HooshvareLab/distilbert-fa-zwnj-base">DistilBERT فارسی</option>
+                    <option value="m3hrdadfi/bert-zwnj-wnli-mean-tokens">BERT پارسی</option>
+                    <option value="custom">مدل سفارشی</option>
+                `;
+            } else if (lang === 'en') {
+                modelSelect.innerHTML = `
+                    <option value="distilbert-base-uncased">DistilBERT انگلیسی</option>
+                    <option value="bert-base-uncased">BERT انگلیسی</option>
+                    <option value="roberta-base">RoBERTa انگلیسی</option>
+                    <option value="custom">مدل سفارشی</option>
+                `;
+            } else if (lang === 'multilingual') {
+                modelSelect.innerHTML = `
+                    <option value="xlm-roberta-base">XLM-RoBERTa (چندزبانه)</option>
+                    <option value="bert-base-multilingual-cased">BERT چندزبانه</option>
+                    <option value="custom">مدل سفارشی</option>
+                `;
+            }
+        });
+        
+        // مدیریت انتخاب مدل سفارشی
+        document.getElementById('modelSelect').addEventListener('change', function() {
+            const customGroup = document.getElementById('customModelGroup');
+            customGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+        
+        // افزودن ردیف جدید به جدول
+        document.getElementById('addRow').addEventListener('click', function() {
+            addNewRow();
+            updateStats();
+        });
+        
+        // پاک کردن جدول
+        document.getElementById('clearTable').addEventListener('click', function() {
+            if (dataset.length > 0 && confirm('آیا از پاک کردن تمام داده‌ها مطمئن هستید؟')) {
+                dataset = [];
+                renderTable();
+                updateStats();
+                showToast('تمام داده‌ها پاک شدند', 'warning');
+            }
+        });
+        
+        // افزودن داده نمونه
+        document.getElementById('addSampleData').addEventListener('click', function() {
+            const sampleData = [
+                { text: "این فیلم واقعاً عالی بود و بازیگران عملکرد درخشانی داشتند", label: "مثبت" },
+                { text: "من از این محصول کاملاً راضی هستم و توصیه می‌کنم", label: "مثبت" },
+                { text: "کتاب بسیار جذاب و آموزنده‌ای بود", label: "مثبت" },
+                { text: "سرویس بدی داشتند و دیگر از این شرکت خرید نمی‌کنم", label: "منفی" },
+                { text: "خدمات آنها افتضاح بود", label: "منفی" },
+                { text: "تجربه خوبی بود حتماً تکرار می‌کنم", label: "مثبت" },
+                { text: "نمی‌توانم باور کنم چقدر خوب بود", label: "مثبت" },
+                { text: "بدترین تجربه عمرم بود", label: "منفی" },
+                { text: "از کیفیت محصول شگفت‌زده شدم", label: "مثبت" },
+                { text: "پشتیبانی بسیار ضعیف بود", label: "منفی" }
+            ];
+            
+            dataset = [...dataset, ...sampleData];
+            renderTable();
+            updateStats();
+            showToast('داده‌های نمونه با موفقیت افزوده شدند', 'success');
+        });
+        
+        // یکسان‌سازی برچسب‌ها
+        document.getElementById('normalizeLabels').addEventListener('click', function() {
+            normalizeLabels();
+            renderTable();
+            updateStats();
+            showToast('برچسب‌ها یکسان‌سازی شدند', 'success');
+        });
+        
+        // تحلیل داده‌ها
+        document.getElementById('analyzeData').addEventListener('click', function() {
+            openAnalysisModal();
+        });
+        
+        // تولید کد کامل
+        document.getElementById('generateFullCode').addEventListener('click', function() {
+            generateFullCode();
+        });
+        
+        // کپی کد
+        document.getElementById('copyCode').addEventListener('click', function() {
+            copyToClipboard(codeEditor.getValue());
+            showToast('کد با موفقیت کپی شد', 'success');
+        });
+        
+        // دانلود کد
+        document.getElementById('downloadCode').addEventListener('click', function() {
+            downloadCode();
+        });
+        
+        // باز کردن در Colab
+        document.getElementById('openColab').addEventListener('click', function() {
+            openInColab();
+        });
+        
+        // وارد کردن CSV
+        document.getElementById('importCSV').addEventListener('click', function() {
+            importFromCSV();
+        });
+        
+        // وارد کردن JSON
+        document.getElementById('importJSON').addEventListener('click', function() {
+            importFromJSON();
+        });
+        
+        // کپی CSV
+        document.getElementById('copyCSV').addEventListener('click', function() {
+            copyToClipboard(document.getElementById('csvExport').value);
+            showToast('داده‌های CSV کپی شدند', 'success');
+        });
+        
+        // دانلود CSV
+        document.getElementById('downloadCSV').addEventListener('click', function() {
+            downloadCSV();
+        });
+        
+        // کپی JSON
+        document.getElementById('copyJSON').addEventListener('click', function() {
+            copyToClipboard(document.getElementById('jsonExport').value);
+            showToast('داده‌های JSON کپی شدند', 'success');
+        });
+        
+        // دانلود JSON
+        document.getElementById('downloadJSON').addEventListener('click', function() {
+            downloadJSON();
+        });
+        
+        // بستن مودال تحلیل
+        document.getElementById('closeAnalysisModal').addEventListener('click', function() {
+            document.getElementById('analysisModal').style.display = 'none';
+        });
+        
+        // تابع‌های کمکی
+        
+        function addNewRow(text = '', label = '') {
+            dataset.push({ text, label });
+            renderTable();
+            updateStats();
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            dataset.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>
+                        <textarea class="text-input" data-index="${index}" data-field="text" 
+                                  oninput="updateCell(this)" placeholder="متن را اینجا وارد کنید">${item.text}</textarea>
+                    </td>
+                    <td>
+                        <input type="text" class="label-input" data-index="${index}" data-field="label" 
+                               oninput="updateCell(this)" value="${item.label}" placeholder="برچسب">
+                    </td>
+                    <td>
+                        <div class="row-actions">
+                            <button class="action-btn edit" onclick="editRow(${index})" title="ویرایش">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteRow(${index})" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="action-btn" onclick="moveRow(${index}, 'up')" ${index === 0 ? 'disabled' : ''} title="جابجایی به بالا">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="action-btn" onclick="moveRow(${index}, 'down')" ${index === dataset.length - 1 ? 'disabled' : ''} title="جابجایی به پایین">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('dataCount').textContent = `${dataset.length} رکورد`;
+            dataChanged = true;
+        }
+        
+        function updateCell(element) {
+            const index = parseInt(element.getAttribute('data-index'));
+            const field = element.getAttribute('data-field');
+            const value = element.value.trim();
+            
+            dataset[index][field] = value;
+            updateStats();
+        }
+        
+        function deleteRow(index) {
+            if (confirm('آیا از حذف این ردیف مطمئن هستید؟')) {
+                dataset.splice(index, 1);
+                renderTable();
+                updateStats();
+                showToast('ردیف با موفقیت حذف شد', 'warning');
+            }
+        }
+        
+        function editRow(index) {
+            // در این نسخه ساده، فقط فوکوس می‌دهیم
+            const textInput = document.querySelector(`textarea[data-index="${index}"][data-field="text"]`);
+            if (textInput) {
+                textInput.focus();
+            }
+        }
+        
+        function moveRow(index, direction) {
+            if (direction === 'up' && index > 0) {
+                [dataset[index], dataset[index - 1]] = [dataset[index - 1], dataset[index]];
+                renderTable();
+            } else if (direction === 'down' && index < dataset.length - 1) {
+                [dataset[index], dataset[index + 1]] = [dataset[index + 1], dataset[index]];
+                renderTable();
+            }
+        }
+        
+        function normalizeLabels() {
+            const changes = [];
+            
+            dataset.forEach((item, index) => {
+                const original = item.label;
+                const normalized = original.trim().toLowerCase();
+                
+                if (original !== normalized) {
+                    changes.push({ index, from: original, to: normalized });
+                    item.label = normalized;
+                }
+            });
+            
+            if (changes.length > 0) {
+                showToast(`${changes.length} برچسب یکسان‌سازی شدند`, 'success');
+            } else {
+                showToast('همه برچسب‌ها از قبل یکسان‌سازی شده بودند', 'info');
+            }
+        }
+        
+        function updateStats() {
+            // آمار پایه
+            const totalSamples = dataset.filter(d => d.text.trim() !== '').length;
+            const labels = dataset.map(d => d.label.trim().toLowerCase()).filter(l => l !== '');
+            const uniqueLabels = [...new Set(labels)];
+            const avgTextLength = dataset.length > 0 ? 
+                Math.round(dataset.reduce((sum, d) => sum + d.text.length, 0) / dataset.length) : 0;
+            
+            // محاسبه تعادل داده‌ها
+            let balance = '100%';
+            if (uniqueLabels.length > 0) {
+                const labelCounts = {};
+                labels.forEach(label => {
+                    labelCounts[label] = (labelCounts[label] || 0) + 1;
+                });
+                
+                const percentages = Object.values(labelCounts).map(count => (count / labels.length) * 100);
+                const maxPercent = Math.max(...percentages);
+                const minPercent = Math.min(...percentages);
+                balance = `${Math.round((minPercent / maxPercent) * 100)}%`;
+            }
+            
+            // به روزرسانی UI
+            document.getElementById('totalSamples').textContent = totalSamples;
+            document.getElementById('uniqueLabels').textContent = uniqueLabels.length;
+            document.getElementById('avgTextLength').textContent = avgTextLength;
+            document.getElementById('dataBalance').textContent = balance;
+            
+            // به روزرسانی توزیع برچسب‌ها
+            updateLabelDistribution(labels, uniqueLabels);
+            
+            // به روزرسانی پیش‌نمایش
+            updateDataPreview();
+            
+            // بررسی کیفیت داده‌ها
+            checkDataQuality();
+            
+            // به روزرسانی وضعیت کد
+            updateCodeStatus();
+        }
+        
+        function updateLabelDistribution(labels, uniqueLabels) {
+            const container = document.getElementById('distributionBars');
+            container.innerHTML = '';
+            
+            if (labels.length === 0) return;
+            
+            const labelCounts = {};
+            labels.forEach(label => {
+                labelCounts[label] = (labelCounts[label] || 0) + 1;
+            });
+            
+            uniqueLabels.forEach(label => {
+                const count = labelCounts[label] || 0;
+                const percentage = Math.round((count / labels.length) * 100);
+                
+                const item = document.createElement('div');
+                item.className = 'label-item';
+                item.innerHTML = `
+                    <span>${label}</span>
+                    <span>${count} نمونه (${percentage}%)</span>
+                `;
+                container.appendChild(item);
+                
+                const bar = document.createElement('div');
+                bar.className = 'distribution-bar';
+                const fill = document.createElement('div');
+                fill.className = 'distribution-fill';
+                fill.style.width = `${percentage}%`;
+                bar.appendChild(fill);
+                container.appendChild(bar);
+            });
+            
+            labelStats = labelCounts;
+        }
+        
+        function updateDataPreview() {
+            const container = document.getElementById('dataPreview');
+            
+            if (dataset.length === 0) {
+                container.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">داده‌ای برای نمایش وجود ندارد</p>';
+                return;
+            }
+            
+            let html = '<div style="font-family: monospace; font-size: 12px;">';
+            
+            dataset.slice(0, 5).forEach((item, index) => {
+                html += `
+                    <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <div style="color: var(--accent); margin-bottom: 8px; font-weight: bold;">
+                            نمونه ${index + 1}:
+                        </div>
+                        <div style="margin-bottom: 8px; color: #ddd;">
+                            ${item.text.substring(0, 80)}${item.text.length > 80 ? '...' : ''}
+                        </div>
+                        <div style="color: var(--success); font-weight: bold;">
+                            برچسب: ${item.label || 'بدون برچسب'}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (dataset.length > 5) {
+                html += `<p style="color: #888; text-align: center; margin-top: 10px;">+ ${dataset.length - 5} نمونه دیگر</p>`;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function checkDataQuality() {
+            const warnings = [];
+            
+            // 1. بررسی برچسب‌های خالی
+            const emptyLabels = dataset.filter(d => d.text.trim() !== '' && d.label.trim() === '').length;
+            if (emptyLabels > 0) {
+                warnings.push({
+                    icon: 'fa-exclamation-triangle',
+                    message: `${emptyLabels} نمونه بدون برچسب وجود دارد`
+                });
+            }
+            
+            // 2. بررسی متن‌های خالی
+            const emptyTexts = dataset.filter(d => d.text.trim() === '' && d.label.trim() !== '').length;
+            if (emptyTexts > 0) {
+                warnings.push({
+                    icon: 'fa-exclamation-triangle',
+                    message: `${emptyTexts} نمونه با برچسب اما بدون متن وجود دارد`
+                });
+            }
+            
+            // 3. بررسی یکسان نبودن حروف برچسب‌ها
+            const labels = dataset.map(d => d.label.trim().toLowerCase());
+            const uniqueLabels = [...new Set(labels.filter(l => l !== ''))];
+            const originalLabels = dataset.map(d => d.label.trim()).filter(l => l !== '');
+            const originalUniqueLabels = [...new Set(originalLabels)];
+            
+            if (originalUniqueLabels.length > uniqueLabels.length) {
+                warnings.push({
+                    icon: 'fa-font',
+                    message: 'برچسب‌ها با حروف مختلف نوشته شده‌اند (مثلاً "Spam" و "spam")'
+                });
+            }
+            
+            // 4. بررسی تعادل داده‌ها
+            if (uniqueLabels.length > 1) {
+                const labelCounts = {};
+                labels.forEach(label => {
+                    if (label !== '') labelCounts[label] = (labelCounts[label] || 0) + 1;
+                });
+                
+                const counts = Object.values(labelCounts);
+                const maxCount = Math.max(...counts);
+                const minCount = Math.min(...counts);
+                const imbalanceRatio = maxCount / minCount;
+                
+                if (imbalanceRatio > 5) {
+                    warnings.push({
+                        icon: 'fa-balance-scale',
+                        message: 'داده‌ها نامتوازن هستند (نسبت بیشترین به کمترین کلاس: ' + Math.round(imbalanceRatio) + ' به 1)'
+                    });
+                }
+            }
+            
+            // نمایش هشدارها
+            const container = document.getElementById('qualityWarnings');
+            if (warnings.length === 0) {
+                container.innerHTML = `
+                    <div style="background: rgba(42, 157, 143, 0.1); border: 1px solid var(--success); 
+                                border-radius: 10px; padding: 15px; text-align: center;">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <span style="color: var(--success); margin-right: 10px;">
+                            کیفیت داده‌ها مناسب است
+                        </span>
+                    </div>
+                `;
+            } else {
+                let html = '<div class="data-quality-warnings">';
+                warnings.forEach(warning => {
+                    html += `
+                        <div class="warning-item">
+                            <i class="fas ${warning.icon}"></i>
+                            <span>${warning.message}</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            }
+        }
+        
+        function updateCodeStatus() {
+            const statusElement = document.getElementById('codeReadyStatus');
+            const statsElement = document.getElementById('codeStats');
+            const progressElement = document.getElementById('codeProgress');
+            
+            const validSamples = dataset.filter(d => d.text.trim() !== '' && d.label.trim() !== '').length;
+            
+            if (validSamples >= 10) {
+                statusElement.textContent = 'آماده';
+                statusElement.className = 'badge badge-success';
+                statsElement.textContent = `${validSamples} نمونه معتبر`;
+                progressElement.style.width = '100%';
+            } else if (validSamples > 0) {
+                statusElement.textContent = 'ناقص';
+                statusElement.className = 'badge badge-warning';
+                statsElement.textContent = `${validSamples} نمونه (نیاز به حداقل 10 نمونه)`;
+                progressElement.style.width = `${(validSamples / 10) * 100}%`;
+            } else {
+                statusElement.textContent = 'آماده نیست';
+                statusElement.className = 'badge badge-danger';
+                statsElement.textContent = 'بدون داده';
+                progressElement.style.width = '0%';
+            }
+        }
+        
+        function generateFullCode() {
+            const validData = dataset.filter(d => d.text.trim() !== '' && d.label.trim() !== '');
+            
+            if (validData.length < 10) {
+                showToast('حداقل 10 نمونه معتبر نیاز است', 'error');
+                return;
+            }
+            
+            // جمع‌آوری تنظیمات
+            const language = document.getElementById('languageSelect').value;
+            const modelSelect = document.getElementById('modelSelect').value;
+            const customModel = document.getElementById('customModelName').value;
+            const modelName = modelSelect === 'custom' ? customModel : modelSelect;
+            const numEpochs = document.getElementById('numEpochs').value;
+            const batchSize = document.getElementById('batchSize').value;
+            const learningRate = document.getElementById('learningRate').value;
+            const maxLength = document.getElementById('maxLength').value;
+            const evalMetric = document.getElementById('evalMetric').value;
+            const testSplit = document.getElementById('testSplit').value;
+            
+            // تولید کد
+            const code = generatePythonCode(validData, {
+                language,
+                modelName,
+                numEpochs,
+                batchSize,
+                learningRate,
+                maxLength,
+                evalMetric,
+                testSplit
+            });
+            
+            codeEditor.setValue(code);
+            showToast('کد با موفقیت تولید شد!', 'success');
+            
+            // رفتن به تب کد
+            document.querySelector('.tab[data-tab="code-output"]').click();
+        }
+        
+        function generatePythonCode(data, settings) {
+            // یکسان‌سازی برچسب‌ها و ایجاد نگاشت
+            const labelMapping = {};
+            const normalizedData = data.map(item => {
+                const normalizedLabel = item.label.trim().toLowerCase();
+                return { text: item.text, label: normalizedLabel };
+            });
+            
+            const uniqueLabels = [...new Set(normalizedData.map(d => d.label))];
+            uniqueLabels.forEach((label, index) => {
+                labelMapping[label] = index;
+            });
+            
+            const reverseMapping = {};
+            Object.entries(labelMapping).forEach(([label, id]) => {
+                reverseMapping[id] = label;
+            });
+            
+            // محاسبه آمار برای گزارش
+            const labelCounts = {};
+            normalizedData.forEach(item => {
+                labelCounts[item.label] = (labelCounts[item.label] || 0) + 1;
+            });
+            
+            const isImbalanced = () => {
+                const counts = Object.values(labelCounts);
+                const maxCount = Math.max(...counts);
+                const minCount = Math.min(...counts);
+                return maxCount / minCount > 5;
+            };
+            
+            return `# ======== کد آموزش مدل Hugging Face ========
+# تولید شده توسط دفترچه کدنویس حرفه‌ای
+# تاریخ تولید: ${new Date().toLocaleDateString('fa-IR')}
+# تعداد نمونه‌ها: ${data.length}
+# تعداد کلاس‌ها: ${uniqueLabels.length}
+# وضعیت تعادل داده‌ها: ${isImbalanced() ? 'نامتوازن ⚠️' : 'متوازن ✓'}
+
+# ======== بخش ۱: نصب و وارد کردن کتابخانه‌ها ========
+
+!pip install transformers datasets accelerate -q
+!pip install scikit-learn pandas numpy matplotlib -q
+!pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 -q
+
+import torch
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report, confusion_matrix, f1_score, accuracy_score, precision_score, recall_score
+import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+
+# بررسی GPU
+print("🖥️ بررسی منابع سخت‌افزاری:")
+print(f"   PyTorch نسخه: {torch.__version__}")
+print(f"   GPU در دسترس: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"   نام GPU: {torch.cuda.get_device_name(0)}")
+    print(f"   حافظه GPU: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
+else:
+    print("   ⚠️ GPU پیدا نشد! آموزش روی CPU کند خواهد بود.")
+
+# ======== بخش ۲: ایجاد دیتاست از داده‌های شما ========
+
+from datasets import Dataset, DatasetDict
+import json
+
+# داده‌های شما (${data.length} نمونه)
+data = ${JSON.stringify(normalizedData, null, 2)}
+
+# تبدیل برچسب‌های متنی به عدد
+label_mapping = ${JSON.stringify(labelMapping, null, 2)}
+reverse_mapping = ${JSON.stringify(reverseMapping, null, 2)}
+
+print("🏷️ نگاشت برچسب‌ها:")
+for label, idx in label_mapping.items():
+    print(f"   '{label}' → {idx}")
+
+# تبدیل داده‌ها
+texts = [item['text'] for item in data]
+labels = [label_mapping[item['label']] for item in data]
+
+# ایجاد DataFrame
+df = pd.DataFrame({
+    'text': texts,
+    'label': labels
+})
+
+print(f"\\n📊 آمار دیتاست:")
+print(f"   تعداد کل نمونه‌ها: {len(df)}")
+print(f"   تعداد کلاس‌ها: {len(label_mapping)}")
+print(f"   توزیع کلاس‌ها:")
+
+for label, idx in label_mapping.items():
+    count = list(labels).count(idx)
+    percentage = (count / len(labels)) * 100
+    print(f"      کلاس {idx} ('{label}'): {count} نمونه ({percentage:.1f}%)")
+
+# ایجاد Dataset Hugging Face
+dataset = Dataset.from_pandas(df)
+
+# تقسیم داده‌ها به آموزش و آزمایش
+dataset = dataset.train_test_split(
+    test_size=${settings.testSplit}, 
+    seed=42,
+    stratify_by_column='label'  # برای حفظ توزیع کلاس‌ها
+)
+
+print(f"\\n🔀 تقسیم داده‌ها:")
+print(f"   داده‌های آموزش: {len(dataset['train'])} نمونه")
+print(f"   داده‌های آزمایش: {len(dataset['test'])} نمونه")
+
+# ======== بخش ۳: بارگیری مدل و توکنایزر ========
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import TrainingArguments, Trainer
+
+print(f"\\n🤖 بارگیری مدل {settings.modelName}...")
+
+try:
+    tokenizer = AutoTokenizer.from_pretrained("${settings.modelName}")
+    model = AutoModelForSequenceClassification.from_pretrained(
+        "${settings.modelName}",
+        num_labels=len(label_mapping),
+        ignore_mismatched_sizes=True
+    )
+    print("   ✅ مدل و توکنایزر با موفقیت بارگیری شدند")
+except Exception as e:
+    print(f"   ❌ خطا در بارگیری مدل: {e}")
+    print("   در حال بارگیری مدل جایگزین...")
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+    model = AutoModelForSequenceClassification.from_pretrained(
+        "distilbert-base-uncased",
+        num_labels=len(label_mapping)
+    )
+
+# ======== بخش ۴: پیش‌پردازش داده‌ها ========
+
+def preprocess_function(examples):
+    return tokenizer(
+        examples['text'],
+        truncation=True,
+        padding='max_length',
+        max_length=${settings.maxLength},
+        return_tensors='pt'
+    )
+
+print("\\n⚙️ توکنایز کردن داده‌ها...")
+
+# توکنایز کردن
+tokenized_dataset = dataset.map(preprocess_function, batched=True)
+
+# حذف ستون متن اصلی
+tokenized_dataset = tokenized_dataset.remove_columns(['text'])
+
+# تنظیم فرمت برای PyTorch
+tokenized_dataset.set_format('torch')
+
+print("   ✅ پیش‌پردازش کامل شد")
+
+# ======== بخش ۵: تعریف توابع ارزیابی ========
+
+def compute_metrics(p):
+    predictions, labels = p
+    predictions = np.argmax(predictions, axis=1)
+    
+    # محاسبه معیارهای مختلف
+    results = {
+        'accuracy': accuracy_score(labels, predictions),
+        'f1_weighted': f1_score(labels, predictions, average='weighted'),
+        'f1_macro': f1_score(labels, predictions, average='macro'),
+        'precision_weighted': precision_score(labels, predictions, average='weighted'),
+        'recall_weighted': recall_score(labels, predictions, average='weighted')
+    }
+    
+    # اضافه کردن معیار انتخاب شده به عنوان معیار اصلی
+    if '${settings.evalMetric}' == 'accuracy':
+        results['eval_score'] = results['accuracy']
+    elif '${settings.evalMetric}' == 'f1':
+        results['eval_score'] = results['f1_weighted']
+    elif '${settings.evalMetric}' == 'precision':
+        results['eval_score'] = results['precision_weighted']
+    elif '${settings.evalMetric}' == 'recall':
+        results['eval_score'] = results['recall_weighted']
+    
+    return results
+
+def plot_confusion_matrix(labels, predictions, class_names):
+    """تابع رسم ماتریس درهم‌ریختگی"""
+    cm = confusion_matrix(labels, predictions)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                xticklabels=class_names, yticklabels=class_names)
+    plt.title('ماتریس درهم‌ریختگی')
+    plt.ylabel('برچسب واقعی')
+    plt.xlabel('برچسب پیش‌بینی شده')
+    plt.show()
+
+# ======== بخش ۶: تنظیم پارامترهای آموزش ========
+
+training_args = TrainingArguments(
+    output_dir='./results',
+    evaluation_strategy='epoch',
+    save_strategy='epoch',
+    learning_rate=${settings.learningRate},
+    per_device_train_batch_size=${settings.batchSize},
+    per_device_eval_batch_size=${settings.batchSize},
+    num_train_epochs=${settings.numEpochs},
+    weight_decay=0.01,
+    load_best_model_at_end=True,
+    metric_for_best_model='eval_score',
+    greater_is_better=True,
+    logging_dir='./logs',
+    logging_steps=10,
+    report_to='none',
+    save_total_limit=2,
+    push_to_hub=False,
+    seed=42
+)
+
+print(f"\\n🎯 پارامترهای آموزش:")
+print(f"   تعداد دوره‌ها: {settings.numEpochs}")
+print(f"   اندازه دسته: {settings.batchSize}")
+print(f"   نرخ یادگیری: {settings.learningRate}")
+print(f"   معیار ارزیابی: {settings.evalMetric}")
+
+# ======== بخش ۷: آموزش مدل ========
+
+print("\\n🚀 شروع آموزش مدل...")
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_dataset['train'],
+    eval_dataset=tokenized_dataset['test'],
+    tokenizer=tokenizer,
+    compute_metrics=compute_metrics,
+)
+
+# آموزش مدل
+train_results = trainer.train()
+
+print("\\n✅ آموزش کامل شد!")
+
+# ======== بخش ۸: ارزیابی نهایی ========
+
+print("\\n📈 ارزیابی نهایی مدل...")
+
+# ارزیابی روی داده آزمایشی
+eval_results = trainer.evaluate()
+print(f"\\nنتایج ارزیابی:")
+
+for key, value in eval_results.items():
+    if isinstance(value, float):
+        print(f"   {key}: {value:.4f}")
+
+# پیش‌بینی روی داده آزمایشی
+predictions = trainer.predict(tokenized_dataset['test'])
+pred_labels = np.argmax(predictions.predictions, axis=1)
+true_labels = predictions.label_ids
+
+# گزارش طبقه‌بندی کامل
+print(f"\\n📊 گزارش طبقه‌بندی کامل:")
+class_names = [reverse_mapping[str(i)] for i in range(len(reverse_mapping))]
+print(classification_report(true_labels, pred_labels, 
+                           target_names=class_names, digits=4))
+
+# رسم ماتریس درهم‌ریختگی
+print("\\n🔄 رسم ماتریس درهم‌ریختگی...")
+try:
+    plot_confusion_matrix(true_labels, pred_labels, class_names)
+except:
+    print("   ⚠️ رسم ماتریس درهم‌ریختگی با خطا مواجه شد")
+
+# ======== بخش ۹: تست مدل روی نمونه‌های جدید ========
+
+def predict(text, model, tokenizer, reverse_mapping, max_length=${settings.maxLength}):
+    """تابع پیش‌بینی برای نمونه‌های جدید"""
+    inputs = tokenizer(
+        text,
+        return_tensors='pt',
+        truncation=True,
+        padding=True,
+        max_length=max_length
+    )
+    
+    with torch.no_grad():
+        outputs = model(**inputs)
+    
+    predictions = torch.softmax(outputs.logits, dim=-1)
+    predicted_class = torch.argmax(predictions, dim=-1).item()
+    predicted_label = reverse_mapping[str(predicted_class)]
+    probabilities = predictions.numpy()[0]
+    
+    return predicted_label, probabilities
+
+print("\\n🧪 تست مدل روی نمونه‌های جدید:")
+
+# انتخاب چند نمونه تصادفی برای تست
+test_samples = ${JSON.stringify(data.slice(0, 3).map(d => d.text), null, 2)}
+
+for i, sample in enumerate(test_samples):
+    try:
+        predicted_label, probabilities = predict(
+            sample, 
+            model, 
+            tokenizer, 
+            reverse_mapping
+        )
+        
+        print(f"\\nنمونه {i+1}:")
+        print(f"   متن: {sample[:60]}...")
+        print(f"   برچسب پیش‌بینی شده: {predicted_label}")
+        print(f"   توزیع احتمالات:")
+        
+        for idx, prob in enumerate(probabilities):
+            label_name = reverse_mapping[str(idx)]
+            print(f"      {label_name}: {prob:.4f}")
+            
+    except Exception as e:
+        print(f"   ❌ خطا در پیش‌بینی نمونه {i+1}: {e}")
+
+# ======== بخش ۱۰: ذخیره مدل و گزارش ========
+
+print("\\n💾 ذخیره مدل و گزارش...")
+
+# ذخیره مدل
+trainer.save_model('./trained_model')
+tokenizer.save_pretrained('./trained_model')
+
+# ذخیره نگاشت برچسب‌ها
+with open('./trained_model/label_mapping.json', 'w', encoding='utf-8') as f:
+    json.dump({
+        'label_to_id': label_mapping,
+        'id_to_label': reverse_mapping
+    }, f, ensure_ascii=False, indent=2)
+
+# تولید گزارش نهایی
+report = {
+    'training_info': {
+        'model_name': '${settings.modelName}',
+        'num_samples': len(data),
+        'num_classes': len(label_mapping),
+        'epochs': ${settings.numEpochs},
+        'batch_size': ${settings.batchSize},
+        'learning_rate': ${settings.learningRate},
+        'test_split': ${settings.testSplit}
+    },
+    'evaluation_results': eval_results,
+    'label_distribution': labelCounts,
+    'timestamp': '${new Date().toISOString()}'
+}
+
+with open('./trained_model/training_report.json', 'w', encoding='utf-8') as f:
+    json.dump(report, f, ensure_ascii=False, indent=2)
+
+print("""
+🎉 آموزش مدل با موفقیت کامل شد!
+
+فایل‌های ذخیره شده:
+   📁 trained_model/               # مدل آموزش دیده
+   📄 trained_model/label_mapping.json    # نگاشت برچسب‌ها
+   📄 trained_model/training_report.json  # گزارش آموزش
+
+دستورات مفید برای Google Colab:
+   1. دانلود مدل: !zip -r model.zip ./trained_model
+   2. بارگذاری در گوگل درایو:
+      from google.colab import drive
+      drive.mount('/content/drive')
+      !cp -r ./trained_model /content/drive/MyDrive/
+   3. بارگیری مدل ذخیره شده:
+      model = AutoModelForSequenceClassification.from_pretrained('./trained_model')
+      tokenizer = AutoTokenizer.from_pretrained('./trained_model')
+
+برای استفاده از مدل در production:
+   from transformers import pipeline
+   classifier = pipeline('text-classification', 
+                        model='./trained_model',
+                        tokenizer='./trained_model')
+   result = classifier("متن جدید برای پیش‌بینی")
+""")
+
+# ======== بخش ۱۱: پاکسازی حافظه ========
+
+import gc
+torch.cuda.empty_cache()
+gc.collect()
+
+print("\\n🧹 حافظه پاکسازی شد")
+print("=" * 60)
+print("✨ کار تمام شد! مدل شما آماده استفاده است.")
+print("=" * 60)`;
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('متن کپی شد', 'success');
+            }).catch(err => {
+                showToast('خطا در کپی کردن', 'error');
+            });
+        }
+        
+        function downloadCode() {
+            const code = codeEditor.getValue();
+            if (!code.trim()) {
+                showToast('کدی برای دانلود وجود ندارد', 'error');
+                return;
+            }
+            
+            const blob = new Blob([code], { type: 'text/x-python' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `hf_training_${new Date().getTime()}.py`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('فایل با موفقیت دانلود شد', 'success');
+        }
+        
+        function openInColab() {
+            const code = codeEditor.getValue();
+            if (!code.trim()) {
+                showToast('کدی برای ارسال به Colab وجود ندارد', 'error');
+                return;
+            }
+            
+            // کد را در localStorage ذخیره می‌کنیم
+            localStorage.setItem('colab_code', code);
+            
+            // باز کردن لینک Colab با پارامتر
+            const encodedCode = encodeURIComponent(code);
+            const colabUrl = `https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/tutorials/_index.ipynb#scrollTo=${Date.now()}`;
+            
+            window.open(colabUrl, '_blank');
+            showToast('در حال باز کردن Google Colab...', 'info');
+        }
+        
+        function updateExportData() {
+            const validData = dataset.filter(d => d.text.trim() !== '' && d.label.trim() !== '');
+            
+            // CSV
+            const csvLines = validData.map(d => `"${d.text.replace(/"/g, '""')}","${d.label}"`);
+            const csvContent = "متن,برچسب\\n" + csvLines.join("\\n");
+            document.getElementById('csvExport').value = csvContent;
+            
+            // JSON
+            const jsonContent = JSON.stringify(validData, null, 2);
+            document.getElementById('jsonExport').value = jsonContent;
+        }
+        
+        function importFromCSV() {
+            const csvText = document.getElementById('csvImport').value.trim();
+            if (!csvText) {
+                showToast('لطفا داده CSV را وارد کنید', 'error');
+                return;
+            }
+            
+            try {
+                const lines = csvText.split('\\n');
+                const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                
+                if (headers.length < 2 || !headers.includes('متن') || !headers.includes('برچسب')) {
+                    showToast('فرمت CSV نامعتبر است. باید شامل ستون‌های "متن" و "برچسب" باشد', 'error');
+                    return;
+                }
+                
+                const newData = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    // تجزیه ساده CSV (توجه: این نسخه ساده است و CSVهای پیچیده را پشتیبانی نمی‌کند)
+                    const parts = line.match(/(?:[^,"]+|"(?:[^"]|"")*")+/g);
+                    if (parts && parts.length >= 2) {
+                        const text = parts[0].replace(/^"|"$/g, '').replace(/""/g, '"');
+                        const label = parts[1].replace(/^"|"$/g, '').replace(/""/g, '"');
+                        
+                        if (text && label) {
+                            newData.push({ text, label });
+                        }
+                    }
+                }
+                
+                dataset = [...dataset, ...newData];
+                renderTable();
+                updateStats();
+                showToast(`${newData.length} نمونه با موفقیت وارد شدند`, 'success');
+                
+            } catch (error) {
+                showToast(`خطا در وارد کردن CSV: ${error.message}`, 'error');
+            }
+        }
+        
+        function importFromJSON() {
+            const jsonText = document.getElementById('jsonImport').value.trim();
+            if (!jsonText) {
+                showToast('لطفا داده JSON را وارد کنید', 'error');
+                return;
+            }
+            
+            try {
+                const newData = JSON.parse(jsonText);
+                
+                if (!Array.isArray(newData)) {
+                    showToast('فرمت JSON نامعتبر است. باید یک آرایه باشد', 'error');
+                    return;
+                }
+                
+                const validItems = newData.filter(item => 
+                    item && typeof item === 'object' && 
+                    item.text && item.label
+                );
+                
+                dataset = [...dataset, ...validItems];
+                renderTable();
+                updateStats();
+                showToast(`${validItems.length} نمونه با موفقیت وارد شدند`, 'success');
+                
+            } catch (error) {
+                showToast(`خطا در وارد کردن JSON: ${error.message}`, 'error');
+            }
+        }
+        
+        function downloadCSV() {
+            const csvText = document.getElementById('csvExport').value;
+            if (!csvText.trim()) {
+                showToast('داده‌ای برای دانلود وجود ندارد', 'error');
+                return;
+            }
+            
+            const blob = new Blob(['\ufeff' + csvText], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dataset_${new Date().getTime()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('فایل CSV دانلود شد', 'success');
+        }
+        
+        function downloadJSON() {
+            const jsonText = document.getElementById('jsonExport').value;
+            if (!jsonText.trim()) {
+                showToast('داده‌ای برای دانلود وجود ندارد', 'error');
+                return;
+            }
+            
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dataset_${new Date().getTime()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('فایل JSON دانلود شد', 'success');
+        }
+        
+        function openAnalysisModal() {
+            const validData = dataset.filter(d => d.text.trim() !== '' && d.label.trim() !== '');
+            
+            if (validData.length === 0) {
+                showToast('داده‌ای برای تحلیل وجود ندارد', 'error');
+                return;
+            }
+            
+            // محاسبه آمار پیشرفته
+            const labels = validData.map(d => d.label.trim().toLowerCase());
+            const uniqueLabels = [...new Set(labels)];
+            
+            const labelStats = {};
+            labels.forEach(label => {
+                labelStats[label] = (labelStats[label] || 0) + 1;
+            });
+            
+            const textLengths = validData.map(d => d.text.length);
+            const avgLength = Math.round(textLengths.reduce((a, b) => a + b, 0) / textLengths.length);
+            const maxLength = Math.max(...textLengths);
+            const minLength = Math.min(...textLengths);
+            
+            // محتوای تحلیل
+            let analysisHTML = `
+                <div style="margin: 20px 0;">
+                    <h3 style="color: var(--accent); margin-bottom: 20px;">
+                        <i class="fas fa-chart-bar"></i> تحلیل جامع داده‌ها
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px;">
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px;">آمار کلی</h4>
+                            <p>تعداد نمونه‌ها: <strong>${validData.length}</strong></p>
+                            <p>تعداد کلاس‌ها: <strong>${uniqueLabels.length}</strong></p>
+                            <p>میانگین طول متن: <strong>${avgLength} کاراکتر</strong></p>
+                            <p>حداکثر طول: <strong>${maxLength} کاراکتر</strong></p>
+                            <p>حداقل طول: <strong>${minLength} کاراکتر</strong></p>
+                        </div>
+                        
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px;">توزیع کلاس‌ها</h4>
+            `;
+            
+            // اضافه کردن توزیع کلاس‌ها
+            Object.entries(labelStats).forEach(([label, count]) => {
+                const percentage = ((count / validData.length) * 100).toFixed(1);
+                analysisHTML += `
+                    <div style="margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>${label}</span>
+                            <span>${count} (${percentage}%)</span>
+                        </div>
+                        <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 5px;">
+                            <div style="height: 100%; width: ${percentage}%; background: var(--accent); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            analysisHTML += `
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h4 style="color: var(--accent); margin-bottom: 15px;">توصیه‌های آموزش</h4>
+            `;
+            
+            // توصیه‌ها
+            const recommendations = [];
+            
+            if (validData.length < 100) {
+                recommendations.push('📊 <strong>اندازه داده کوچک است:</strong> برای نتایج بهتر حداقل ۱۰۰ نمونه جمع‌آوری کنید.');
+            }
+            
+            if (uniqueLabels.length < 2) {
+                recommendations.push('🏷️ <strong>تنها یک کلاس وجود دارد:</strong> برای طبقه‌بندی به حداقل ۲ کلاس نیاز است.');
+            }
+            
+            const maxCount = Math.max(...Object.values(labelStats));
+            const minCount = Math.min(...Object.values(labelStats));
+            const imbalanceRatio = maxCount / minCount;
+            
+            if (imbalanceRatio > 5) {
+                recommendations.push(`⚖️ <strong>داده‌ها نامتوازن هستند:</strong> نسبت ${imbalanceRatio.toFixed(1)} به ۱. برای بهبود نتایج:
+                    <ul style="margin-right: 20px; margin-top: 5px;">
+                        <li>از معیار F1-Score به جای Accuracy استفاده کنید</li>
+                        <li>کلاس وزن‌ها (class_weight) را در آموزش تنظیم کنید</li>
+                        <li>از تکنیک‌های نمونه‌برداری مجدد استفاده کنید</li>
+                    </ul>`);
+            }
+            
+            if (avgLength > 200) {
+                recommendations.push('📏 <strong>متن‌ها طولانی هستند:</strong> برای بهبود عملکرد، max_length را به ۵۱۲ افزایش دهید.');
+            }
+            
+            if (recommendations.length === 0) {
+                recommendations.push('✅ <strong>کیفیت داده‌ها عالی است!</strong> می‌توانید آموزش را شروع کنید.');
+            }
+            
+            recommendations.forEach(rec => {
+                analysisHTML += `<div style="margin-bottom: 15px; padding: 10px; background: rgba(76, 201, 240, 0.1); border-radius: 8px;">${rec}</div>`;
+            });
+            
+            analysisHTML += `
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('analysisContent').innerHTML = analysisHTML;
+            document.getElementById('analysisModal').style.display = 'flex';
+        }
+        
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: '#2a9d8f',
+                error: '#f72585',
+                warning: '#f8961e',
+                info: '#4361ee'
+            };
+            
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "left",
+                backgroundColor: colors[type] || colors.info,
+                stopOnFocus: true,
+                className: "toastify-right"
+            }).showToast();
+        }
+        
+        // مقداردهی اولیه
+        document.addEventListener('DOMContentLoaded', function() {
+            // اضافه کردن چند نمونه اولیه
+            addNewRow('این یک نمونه متن است', 'مثبت');
+            addNewRow('متن نمونه دیگری', 'منفی');
+            
+            // به روزرسانی آمار
+            updateStats();
+            
+            // نمایش راهنمای اولیه
+            showToast('به دفترچه کدنویس حرفه‌ای خوش آمدید!', 'info');
+        });
+        
+        // قرار دادن توابع در scope جهانی برای دسترسی از inline events
+        window.updateCell = updateCell;
+        window.deleteRow = deleteRow;
+        window.editRow = editRow;
+        window.moveRow = moveRow;
+    </script>
+</body>
+</html>

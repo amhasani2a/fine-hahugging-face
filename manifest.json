@@ -1,0 +1,21 @@
+{
+  "name": "HF Code Generator Pro",
+  "short_name": "HF CodeGen",
+  "description": "Professional tool for generating Hugging Face training scripts.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#4361ee",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
