@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face Training Code Generator Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Hugging Face Training Code Generator Pro</h1>
+            <p>Secure tool for converting text data into Hugging Face training scripts - with advanced quality control features</p>
+        </div>
+        
+        <div class="warning-banner">
+            <i class="fas fa-exclamation-triangle fa-2x"></i>
+            <div>
+                <h3>Important: Data Processing happens 100% in your browser!</h3>
+                <p>No data is stored on servers. Your datasets are safe and private.</p>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="data-input">
+                <i class="fas fa-table"></i> Data Input
+            </button>
+            <button class="tab" data-tab="model-settings">
+                <i class="fas fa-cogs"></i> Model Settings
+            </button>
+            <button class="tab" data-tab="code-output">
+                <i class="fas fa-code"></i> Generated Code
+            </button>
+            <button class="tab" data-tab="import-export">
+                <i class="fas fa-file-export"></i> Import/Export
+            </button>
+        </div>
+        
+        <div id="data-input" class="tab-content active">
+            <div class="data-input-section">
+                <div class="data-table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fas fa-database"></i> Dataset Table
+                            <span class="badge badge-warning" id="dataCount">0 records</span>
+                        </h3>
+                        <div class="table-controls">
+                            <button class="btn btn-success btn-sm" id="addRowBtn">
+                                <i class="fas fa-plus"></i> Add Row
+                            </button>
+                            <button class="btn btn-danger btn-sm" id="clearTableBtn">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="data-table">
+                        <table id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Text</th>
+                                    <th style="width: 200px;">Label</th>
+                                    <th style="width: 120px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-controls">
+                        <button class="btn btn-primary" id="addSampleDataBtn">
+                            <i class="fas fa-vial"></i> Add Sample Data
+                        </button>
+                        <button class="btn btn-warning" id="normalizeLabelsBtn">
+                            <i class="fas fa-broom"></i> Normalize Labels
+                        </button>
+                        <button class="btn btn-success" id="analyzeDataBtn">
+                            <i class="fas fa-chart-bar"></i> Analyze Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sidebar">
+                    <div class="panel stats-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-chart-line"></i> Data Statistics
+                        </h3>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Samples</div>
+                                <div class="stat-value" id="totalSamples">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Unique Labels</div>
+                                <div class="stat-value" id="uniqueLabels">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Average Text Length</div>
+                                <div class="stat-value" id="avgTextLength">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Data Balance</div>
+                                <div class="stat-value" id="dataBalance">0%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="label-distribution">
+                            <h4 style="color: var(--accent); margin: 20px 0 15px 0;">Label Distribution</h4>
+                            <div id="distributionBars">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="data-quality-warnings" id="qualityWarnings">
+                    </div>
+                    
+                    <div class="panel preview-panel">
+                        <h3 class="panel-title">
+                            <i class="fas fa-eye"></i> Data Preview
+                        </h3>
+                        <div id="dataPreview">
+                            <p style="color: #888; text-align: center; padding: 20px;">
+                                No data to display yet
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="model-settings" class="tab-content">
+            <div class="model-settings">
+                <div class="warning-banner" style="background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);">
+                    <i class="fas fa-robot fa-2x"></i>
+                    <div>
+                        <h3>Smart Model Settings</h3>
+                        <p>These settings are optimized based on your dataset analysis</p>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3 class="setting-title">
+                        <i class="fas fa-brain"></i> Select Base Model
+                    </h3>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label">Dataset Language</label>
+                            <select class="form-control form-select" id="languageSelect">
+                                <option value="en">English</option>
+                                <option value="multilingual">Multilingual</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Recommended Model</label>
+                            <select class="form-control form-select" id="modelSelect">
+                                <option value="distilbert-base-uncased">DistilBERT (English)</option>
+                                <option value="bert-base-uncased">BERT (English)</option>
+                                <option value="xlm-roberta-base">XLM-RoBERTa (Multilingual)</option>
+                                <option value="custom">Custom Model</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="customModelGroup" style="display: none;">
+                        <label class="form-label">Hugging Face Model Name</label>
+                        <input type="text" class="form-control" id="customModelName" 
+                               placeholder="Example: bert-base-uncased">
+                        <small style="color: #888; margin-top: 5px;">Enter model name from Hugging Face Model Hub</small>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3 class="setting-title">
+                        <i class="fas fa-sliders-h"></i> Training Parameters
+                    </h3>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label">Number of Epochs</label>
+                            <input type="number" class="form-control" id="numEpochs" value="3" min="1" max="50">
+                            <small style="color: #888; margin-top: 5px;">3-5 for small datasets, 1-3 for large datasets</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Batch Size</label>
+                            <select class="form-control form-select" id="batchSize">
+                                <option value="8">8 (For low VRAM GPUs)</option>
+                                <option value="16" selected>16 (Recommended)</option>
+                                <option value="32">32 (For powerful GPUs)</option>
+                                <option value="64">64 (TPU only)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label">Learning Rate</label>
+                            <select class="form-control form-select" id="learningRate">
+                                <option value="1e-5">0.00001 (Very Slow)</option>
+                                <option value="2e-5" selected>0.00002 (Recommended)</option>
+                                <option value="5e-5">0.00005 (Fast)</option>
+                                <option value="1e-4">0.0001 (Very Fast - Be Careful)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Maximum Text Length (Tokens)</label>
+                            <select class="form-control form-select" id="maxLength">
+                                <option value="128">128 (Short texts)</option>
+                                <option value="256" selected>256 (Recommended)</option>
+                                <option value="512">512 (Long texts)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3 class="setting-title">
+                        <i class="fas fa-chart-bar"></i> Evaluation & Reporting
+                    </h3>
+                    
+                    <div class="setting-row">
+                        <div class="form-group">
+                            <label class="form-label tooltip">
+                                Primary Evaluation Metric
+                                <span class="tooltip-text">Use F1-Score for imbalanced data. Accuracy is only suitable for balanced datasets.</span>
+                            </label>
+                            <select class="form-control form-select" id="evalMetric">
+                                <option value="f1">F1-Score (Recommended)</option>
+                                <option value="accuracy">Accuracy</option>
+                                <option value="precision">Precision</option>
+                                <option value="recall">Recall</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Test Split Ratio</label>
+                            <select class="form-control form-select" id="testSplit">
+                                <option value="0.1">10%</option>
+                                <option value="0.2" selected>20%</option>
+                                <option value="0.3">30%</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <p>
+                            <strong>Note:</strong> If your data is imbalanced, a full Classification Report will be automatically generated,
+                            including Precision, Recall, and F1-Score for each class.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="code-output" class="tab-content">
+            <div class="code-output-section">
+                <div class="code-header">
+                    <h3 class="code-title">
+                        <i class="fas fa-file-code"></i> Complete Python Code
+                        <span class="badge badge-success" id="codeReadyStatus">Not Ready</span>
+                    </h3>
+                    <div class="code-status" id="codeStats">0 lines</div>
+                </div>
+                
+                <div class="code-editor">
+                    <textarea id="pythonCodeOutput"></textarea>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="codeProgress"></div>
+                </div>
+            </div>
+            
+            <div class="final-controls">
+                <button class="btn btn-primary btn-lg" id="generateCodeBtn">
+                    <i class="fas fa-cogs"></i> Generate Code
+                </button>
+                <button class="btn btn-success btn-lg" id="copyCodeBtn">
+                    <i class="fas fa-copy"></i> Copy Code
+                </button>
+                <button class="btn btn-danger btn-lg" id="downloadCodeBtn">
+                    <i class="fas fa-download"></i> Download .py
+                </button>
+                <button class="btn btn-warning btn-lg" id="openColabBtn">
+                    <i class="fab fa-google"></i> Open in Colab
+                </button>
+            </div>
+        </div>
+        
+        <div id="import-export" class="tab-content">
+            <div class="setting-group">
+                <h3 class="setting-title">
+                    <i class="fas fa-file-import"></i> Import Data
+                </h3>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">CSV Format</h4>
+                    <textarea id="csvImport" placeholder="text,label
+This is sample text,positive
+Second sample text,negative
+Each line must have text and label separated by comma"></textarea>
+                    <button class="btn btn-primary" id="importCSVBtn">
+                        <i class="fas fa-upload"></i> Import from CSV
+                    </button>
+                </div>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">JSON Format</h4>
+                    <textarea id="jsonImport" placeholder='[
+  {"text": "First text", "label": "positive"},
+  {"text": "Second text", "label": "negative"}
+]'></textarea>
+                    <button class="btn btn-primary" id="importJSONBtn">
+                        <i class="fas fa-upload"></i> Import from JSON
+                    </button>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h3 class="setting-title">
+                    <i class="fas fa-file-export"></i> Export Data
+                </h3>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">CSV Export</h4>
+                    <textarea id="csvExport" readonly></textarea>
+                    <button class="btn btn-success" id="copyCSVBtn">
+                        <i class="fas fa-copy"></i> Copy CSV
+                    </button>
+                    <button class="btn btn-danger" id="downloadCSVBtn">
+                        <i class="fas fa-download"></i> Download CSV
+                    </button>
+                </div>
+                
+                <div class="import-export-box">
+                    <h4 style="color: var(--accent); margin-bottom: 15px;">JSON Export</h4>
+                    <textarea id="jsonExport" readonly></textarea>
+                    <button class="btn btn-success" id="copyJSONBtn">
+                        <i class="fas fa-copy"></i> Copy JSON
+                    </button>
+                    <button class="btn btn-danger" id="downloadJSONBtn">
+                        <i class="fas fa-download"></i> Download JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><i class="fas fa-code"></i> Hugging Face Training Code Generator Pro - Version 2.0</p>
+            <p>Built with focus on data security, code quality, and safe user experience</p>
+            <p style="margin-top: 10px; font-size: 0.85rem; color: #666;">
+                Features: Data quality control, prevention of data corruption, advanced reporting, multilingual model support
+            </p>
+        </div>
+    </div>
+    
+    <div class="modal" id="analysisModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-chart-pie"></i> Advanced Data Analysis
+                </h2>
+                <button class="close-modal" id="closeAnalysisBtn">&times;</button>
+            </div>
+            
+            <div id="analysisContent">
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
