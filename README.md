@@ -6,7 +6,7 @@ An advanced, secure, and zero-setup web application designed for developers and 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
 
 ## 🌐 Live Demo
-[Launch the Application Here](https://YOUR-USERNAME.github.io/YOUR-REPO-NAME) *(Replace the link above with your actual GitHub Pages URL)*
+[Launch the Application Here](https://amhasani2a.github.io/fine-hahugging-face)
 
 ## ✨ Why this tool?
 Writing fine-tuning scripts for Hugging Face models often requires repetitive boilerplate code. This tool eliminates the hassle. You can visually manage your dataset, tweak hyperparameters, and get a ready-to-run Python script instantly. 
@@ -30,8 +30,8 @@ Writing fine-tuning scripts for Hugging Face models often requires repetitive bo
 
 ## 📦 Installation (Local Development)
 ```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
-cd YOUR-REPO-NAME
+git clone https://github.com/amhasani2a/fine-hahugging-face.git
+cd fine-hahugging-face
 # Open modertrainnig.html in your browser
 ```
 
@@ -45,7 +45,7 @@ cd YOUR-REPO-NAME
 2. Go to **Settings > Pages**.
 3. Select **main** branch as the source.
 4. GitHub Pages will automatically host your app.
-5. Access it via `https://YOUR-USERNAME.github.io/YOUR-REPO-NAME`
+5. Access it via `https://amhasani2a.github.io/fine-hahugging-face`
 
 ## 🤝 Contributing
 Contributions are welcome! Feel free to fork this repository and submit pull requests.
